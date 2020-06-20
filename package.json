@@ -1,6 +1,6 @@
 {
   "name": "pictures",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "Interactive page where you can add photos, delete them and like",
   "main": "app.js",
   "scripts": {
