@@ -1,41 +1,41 @@
 const router = require('express').Router();
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 router.get('/', (req, res) => {
-  fs.readFile(path.join(__dirname, '../data', 'users.json'), {encoding: 'utf-8'}, (err, data) => {
-    if (err) {
-      console.log(err);
-      return
-    };
-
-    res.send(data);
-  });
+  fs.readFile(path.join(__dirname, '../data', 'users.json'), 'utf-8')
+    .then((data) => {
+      res.send(JSON.parse(data));
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
 });
 
 router.get('/:id', (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
 
-  fs.readFile(path.join(__dirname, '../data', 'users.json'), {encoding: 'utf-8'}, (err, data) => {
-    if (err) {
-      console.log(err);
-      return
-    };
+  fs.readFile(path.join(__dirname, '../data', 'users.json'), 'utf-8')
+    .then((data) => {
+      const usersArr = JSON.parse(data);
+      const user = usersArr.find((elem) => {
+        // eslint-disable-next-line
+        if (elem._id === id) {
+          return elem;
+        }
+        return undefined;
+      });
 
-    const usersArr = JSON.parse(data);
-    const user = usersArr.find((elem) => {
-      if (elem._id === id) {
-        return elem;
+      if (!user) {
+        res.status(404).send({ message: 'Нет пользователя с таким id' });
+        return;
       }
+
+      res.send(user);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
     });
-
-    if (!user) {
-      res.status(404).send({"message": "Нет пользователя с таким id"});
-      return;
-    };
-
-    res.send(JSON.stringify(user));
-  });
 });
 
 module.exports = router;
