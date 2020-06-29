@@ -19,7 +19,6 @@ router.get('/:id', (req, res) => {
     .then((data) => {
       const usersArr = JSON.parse(data);
       const user = usersArr.find((elem) => {
-        // eslint-disable-next-line
         if (elem._id === id) {
           return elem;
         }
