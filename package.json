@@ -1,4 +1,4 @@
-{
+ {
   "name": "photos",
   "version": "0.0.7",
   "description": "Interactive page where you can add photos, delete them and like",
@@ -16,6 +16,7 @@
     "nodemon": "^2.0.4"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongoose": "^5.9.20"
   }
 }
