@@ -9,14 +9,14 @@ const createUser = (req, res) => {
 
 const findAllUsers = (req, res) => {
   modelUser.find({})
-    .then((data) => res.send(JSON.parse(data)))
-    .catch((err) => res.status(500).send(err));
+    .then((data) => res.send({ data }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const findUserById = (req, res) => {
   modelUser.findById(req.params.id)
-    .then((data) => res.send(JSON.parse(data)))
-    .catch((err) => res.status(500).send(err));
+    .then((data) => res.send({ data }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports = { createUser, findAllUsers, findUserById };
