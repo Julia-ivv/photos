@@ -19,4 +19,28 @@ const findUserById = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
-module.exports = { createUser, findAllUsers, findUserById };
+const updateUserProfile = (req, res) => {
+  const { name, about } = req.body;
+  modelUser.findByIdAndUpdate(
+    req.user._id,
+    { name, about },
+    { new: true, runValidators: true },
+  )
+    .then((user) => res.send({ data: user }))
+    .catch((err) => res.status(500).send(err));
+};
+
+const updateUserAvatar = (req, res) => {
+  const { avatar } = req.body;
+  modelUser.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    { new: true, runValidators: true },
+  )
+    .then((user) => res.send({ data: user }))
+    .catch((err) => res.status(500).send(err));
+};
+
+module.exports = {
+  createUser, findAllUsers, findUserById, updateUserProfile, updateUserAvatar,
+};
