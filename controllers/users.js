@@ -15,7 +15,10 @@ const findAllUsers = (req, res) => {
 
 const findUserById = (req, res) => {
   modelUser.findById(req.params.id)
-    .then((data) => res.send({ data }))
+    .then((data) => {
+      if (!data) res.status(404).send({ message: 'Пользователь не найден' });
+      else res.send({ data });
+    })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
@@ -26,7 +29,10 @@ const updateUserProfile = (req, res) => {
     { name, about },
     { new: true, runValidators: true },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) res.status(404).send({ message: 'Пользователь не найден' });
+      else res.send({ data: user });
+    })
     .catch((err) => res.status(500).send(err));
 };
 
@@ -37,7 +43,10 @@ const updateUserAvatar = (req, res) => {
     { avatar },
     { new: true, runValidators: true },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) res.status(404).send({ message: 'Пользователь не найден' });
+      else res.send({ data: user });
+    })
     .catch((err) => res.status(500).send(err));
 };
 

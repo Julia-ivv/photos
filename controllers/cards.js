@@ -14,9 +14,18 @@ const findAllCards = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  modelCard.findByIdAndRemove(req.params.id)
-    .then((data) => res.send({ data }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+  modelCard.findById(req.params.id)
+    .then((card) => {
+      if (!card) res.status(404).send({ message: 'Карточка не найдена' });
+      else if (card.owner.equals(req.user._id)) {
+        modelCard.deleteOne(card)
+          .then(() => res.send({ card, message: 'Карточка удалена' }))
+          .catch(() => res.status(500).send({ message: 'Произошла ошибка при удалении' }));
+      } else {
+        res.status(403).send({ message: 'Нельзя удалять чужие карточки' });
+      }
+    })
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка при поиске' }));
 };
 
 const likeCard = (req, res) => {
@@ -25,7 +34,10 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((data) => res.send({ data }))
+    .then((data) => {
+      if (!data) res.status(404).send({ message: 'Карточка не найдена' });
+      else res.send({ data });
+    })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
@@ -35,7 +47,10 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((data) => res.send({ data }))
+    .then((data) => {
+      if (!data) res.status(404).send({ message: 'Карточка не найдена' });
+      else res.send({ data });
+    })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
