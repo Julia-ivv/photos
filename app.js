@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users.js');
 const cardsRouter = require('./routes/cards.js');
 const { login, createUser } = require('./controllers/users');
+const { auth } = require('./middlewares/auth');
 
 const app = express();
 
@@ -14,13 +15,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-app.use((req, res, next) => {
-  req.user = { _id: '5efc80dd035ce094a0bf0faf' };
-  next();
-});
-
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('/users', auth, usersRouter);
+app.use('/cards', auth, cardsRouter);
 app.post('/signin', login);
 app.post('/signup', createUser);
 
