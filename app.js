@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users.js');
 const cardsRouter = require('./routes/cards.js');
+const { login, createUser } = require('./controllers/users');
 
 const app = express();
 
@@ -20,6 +21,8 @@ app.use((req, res, next) => {
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.get(/\/\w+/, (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
