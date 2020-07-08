@@ -1,10 +1,21 @@
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 const modelUser = require('../models/user');
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  modelUser.create({ name, about, avatar })
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  if (!validator.isEmail(email)) {
+    res.status(400).send({ message: 'Ошибка валидации email' });
+    return;
+  }
+  bcrypt.hash(password, 10)
+    .then((hash) => modelUser.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send(err));
+    .catch((err) => res.status(400).send(err));
 };
 
 const findAllUsers = (req, res) => {
