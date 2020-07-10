@@ -1,18 +1,13 @@
-const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const modelUser = require('../models/user');
+const User = require('../models/user');
 
 const createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!validator.isEmail(email)) {
-    res.status(400).send({ message: 'Ошибка валидации email' });
-    return;
-  }
   bcrypt.hash(password, 10)
-    .then((hash) => modelUser.create({
+    .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
     .then((user) => res.send({
@@ -22,13 +17,13 @@ const createUser = (req, res) => {
 };
 
 const findAllUsers = (req, res) => {
-  modelUser.find({})
+  User.find({})
     .then((data) => res.send({ data }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const findUserById = (req, res) => {
-  modelUser.findById(req.params.id)
+  User.findById(req.params.id)
     .then((data) => {
       if (!data) res.status(404).send({ message: 'Пользователь не найден' });
       else res.send({ data });
@@ -38,7 +33,7 @@ const findUserById = (req, res) => {
 
 const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
-  modelUser.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { name, about },
     { new: true, runValidators: true },
@@ -52,7 +47,7 @@ const updateUserProfile = (req, res) => {
 
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
-  modelUser.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { avatar },
     { new: true, runValidators: true },
@@ -66,7 +61,7 @@ const updateUserAvatar = (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
-  return modelUser.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'best-secret-key', { expiresIn: '7d' });
       res.send({ token });

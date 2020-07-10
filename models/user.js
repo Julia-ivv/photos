@@ -36,6 +36,11 @@ userSchema.path('avatar').validate((val) => {
   return urlRegex.test(val);
 }, 'Неверный URL');
 
+userSchema.path('email').validate((val) => {
+  const emailRegex = /(?!.*--)[a-zA-Z0-9][-.\w]*(?<!-)@[a-zA-Z0-9]+[-.\w]*(?<!-)\.[a-zA-Z]+$/;
+  return emailRegex.test(val);
+}, 'Неверный e-mail');
+
 userSchema.statics.findUserByCredentials = function findUserByCredentials(email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
