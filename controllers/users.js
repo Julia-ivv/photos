@@ -1,20 +1,29 @@
-const modelUser = require('../models/user');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  modelUser.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send(err));
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.send({
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+    }))
+    .catch((err) => res.status(400).send(err));
 };
 
 const findAllUsers = (req, res) => {
-  modelUser.find({})
+  User.find({})
     .then((data) => res.send({ data }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const findUserById = (req, res) => {
-  modelUser.findById(req.params.id)
+  User.findById(req.params.id)
     .then((data) => {
       if (!data) res.status(404).send({ message: 'Пользователь не найден' });
       else res.send({ data });
@@ -24,7 +33,7 @@ const findUserById = (req, res) => {
 
 const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
-  modelUser.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { name, about },
     { new: true, runValidators: true },
@@ -38,7 +47,7 @@ const updateUserProfile = (req, res) => {
 
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
-  modelUser.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { avatar },
     { new: true, runValidators: true },
@@ -50,6 +59,16 @@ const updateUserAvatar = (req, res) => {
     .catch((err) => res.status(500).send(err));
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'best-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => res.status(401).send({ message: err.message }));
+};
+
 module.exports = {
-  createUser, findAllUsers, findUserById, updateUserProfile, updateUserAvatar,
+  createUser, findAllUsers, findUserById, updateUserProfile, updateUserAvatar, login,
 };
