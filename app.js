@@ -7,6 +7,7 @@ const cardsRouter = require('./routes/cards.js');
 const { login, createUser } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-error');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -19,6 +20,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
+app.use(requestLogger);
+
 app.use('/users', auth, usersRouter);
 app.use('/cards', auth, cardsRouter);
 app.post('/signin', login);
@@ -27,6 +30,8 @@ app.post('/signup', createUser);
 app.use(('*'), (req, res, next) => {
   next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
