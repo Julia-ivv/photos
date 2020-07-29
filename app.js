@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { errors } = require('celebrate');
+const { errors, celebrate, Joi } = require('celebrate');
 const usersRouter = require('./routes/users.js');
 const cardsRouter = require('./routes/cards.js');
 const { login, createUser } = require('./controllers/users');
@@ -24,8 +24,21 @@ app.use(requestLogger);
 
 app.use('/users', auth, usersRouter);
 app.use('/cards', auth, cardsRouter);
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().regex(/(?!.*--)[a-zA-Z0-9][-.\w]*(?<!-)@[a-zA-Z0-9]+[-.\w]*(?<!-)\.[a-zA-Z]+$/),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+    avatar: Joi.string().required().regex(/^https?:\/\/(www\.)?(((\d{1,3}\.){3}\d{1,3})|([А-ЯЁа-яё0-9][0-9А-ЯЁа-яё\-.]*\.[А-ЯЁа-яё]+|[a-zA-Z0-9][a-zA-Z0-9\-.]*\.[a-zA-Z]+))(:[1-9]\d{1,4})?\/?([-0-9/a-zA-Z&=?+%._]+#?)?$/),
+    email: Joi.string().required().regex(/(?!.*--)[a-zA-Z0-9][-.\w]*(?<!-)@[a-zA-Z0-9]+[-.\w]*(?<!-)\.[a-zA-Z]+$/),
+    password: Joi.string().required().min(8),
+  }),
+}), createUser);
 
 app.use(('*'), (req, res, next) => {
   next(new NotFoundError('Запрашиваемый ресурс не найден'));
