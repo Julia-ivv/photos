@@ -55,7 +55,12 @@ const updateUserProfile = (req, res, next) => {
       if (!user) throw new NotFoundError('Пользователь не найден');
       else res.send({ data: user });
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      let error;
+      if (err.name === 'ValidationError') error = new BadRequest(`Ошибка валидации ${err.message}`);
+      else error = new ServerError();
+      next(error);
+    });
 };
 
 const updateUserAvatar = (req, res, next) => {

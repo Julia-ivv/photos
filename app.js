@@ -34,7 +34,7 @@ app.get('/crash-test', () => {
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().regex(/(?!.*--)[a-zA-Z0-9][-.\w]*(?<!-)@[a-zA-Z0-9]+[-.\w]*(?<!-)\.[a-zA-Z]+$/),
+    email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
 }), login);
@@ -43,7 +43,7 @@ app.post('/signup', celebrate({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
     avatar: Joi.string().required().regex(/^https?:\/\/(www\.)?(((\d{1,3}\.){3}\d{1,3})|([А-ЯЁа-яё0-9][0-9А-ЯЁа-яё\-.]*\.[А-ЯЁа-яё]+|[a-zA-Z0-9][a-zA-Z0-9\-.]*\.[a-zA-Z]+))(:[1-9]\d{1,4})?\/?([-0-9/a-zA-Z&=?+%._]+#?)?$/),
-    email: Joi.string().required().regex(/(?!.*--)[a-zA-Z0-9][-.\w]*(?<!-)@[a-zA-Z0-9]+[-.\w]*(?<!-)\.[a-zA-Z]+$/),
+    email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
 }), createUser);
