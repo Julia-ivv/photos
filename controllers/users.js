@@ -7,6 +7,8 @@ const BadRequest = require('../errors/bad-request-error');
 const AuthorizationError = require('../errors/authorization-error');
 const ConflictError = require('../errors/conflict-error');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -79,7 +81,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'best-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'best-secret-key', { expiresIn: '7d' });
       res.send({ token });
     })
     .catch((err) => next(new AuthorizationError(err.message)));
